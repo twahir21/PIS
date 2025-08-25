@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Passenger Information System</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1e40af',
+            secondary: '#6b7280',
+            success: '#10b981',
+            warning: '#f59e0b',
+            danger: '#ef4444',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+  <!-- Header -->
+  <header class="bg-primary text-white p-4 shadow-md">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold">🚌 Metro Transit PIS</h1>
+      <div id="current-time" class="text-lg font-medium"></div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto p-4 mt-6">
+    <h2 class="text-xl font-semibold mb-4 text-gray-700">Upcoming Departures</h2>
+
+    <!-- Bus Info Table -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bus</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Route</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Destination</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Platform</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departure</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Arrival</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+          </tr>
+        </thead>
+        <tbody id="bus-list" class="bg-white divide-y divide-gray-200">
+          <!-- Dynamic Rows via JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Alerts Section -->
+    <div class="mt-8">
+      <h3 class="text-lg font-semibold mb-2 text-gray-700">Notifications</h3>
+      <div id="alerts" class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-sm hidden">
+        <p id="alert-message"></p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-12 bg-gray-800 text-white text-center py-4 text-sm">
+    <p>&copy; 2025 Metro Transit Authority. All rights reserved.</p>
+  </footer>
+
+  <!-- Simulated Data & Real-Time Updates -->
+  <script>
+    // Sample real-time bus data
+    const buses = [
+      { busNumber: "B101", routeId: "R205", destination: "Downtown Central", platform: "P3", departure: "14:25", arrival: "14:30", status: "On Time", type: "Express" },
+      { busNumber: "B205", routeId: "R301", destination: "North Hills Mall", platform: "P1", departure: "14:32", arrival: "14:35", status: "Delayed", delay: "8 min", type: "Local" },
+      { busNumber: "V900", routeId: "V100", destination: "Airport Terminal B", platform: "P5", departure: "14:40", arrival: "14:55", status: "On Time", type: "VIP" },
+      { busNumber: "B302", routeId: "R404", destination: "University Campus", platform: "P2", departure: "14:45", arrival: "15:00", status: "Delayed", delay: "12 min", type: "Local" },
+      { busNumber: "E500", routeId: "E200", destination: "Eastside Plaza", platform: "P4", departure: "14:50", arrival: "15:10", status: "On Time", type: "Express" }
+    ];
+
+    // Update current time
+    function updateCurrentTime() {
+      const now = new Date();
+      document.getElementById('current-time').textContent = now.toLocaleTimeString();
+    }
+
+    // Render bus list
+    function renderBuses() {
+      const busList = document.getElementById('bus-list');
+      busList.innerHTML = '';
+
+      let hasDelay = false;
+      let alertMessage = '';
+
+      buses.forEach(bus => {
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-gray-50 transition';
+
+        // Status badge
+        let statusBadge = '';
+        if (bus.status === 'On Time') {
+          statusBadge = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success text-white">On Time</span>`;
+        } else {
+          statusBadge = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-warning text-white">Delayed ${bus.delay || ''}</span>`;
+          hasDelay = true;
+          alertMessage += `Bus ${bus.busNumber} to ${bus.destination} is delayed by ${bus.delay}. `;
+        }
+
+        row.innerHTML = `
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="font-medium text-gray-900">${bus.busNumber}</div>
+            <div class="text-sm text-gray-500">Route ${bus.routeId}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${bus.routeId}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="font-medium">${bus.destination}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${bus.platform}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${bus.departure}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${bus.arrival}</td>
+          <td class="px-6 py-4 whitespace-nowrap">${statusBadge}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="inline-block px-2 py-1 text-xs font-semibold rounded ${getTypeColor(bus.type)} text-white">${bus.type}</span>
+          </td>
+        `;
+
+        busList.appendChild(row);
+      });
+
+      // Show alert if any delay
+      const alertBox = document.getElementById('alerts');
+      const alertMsgElem = document.getElementById('alert-message');
+      if (hasDelay) {
+        alertMsgElem.textContent = alertMessage;
+        alertBox.classList.remove('hidden');
+      } else {
+        alertBox.classList.add('hidden');
+      }
+    }
+
+    // Get color for bus type
+    function getTypeColor(type) {
+      switch (type) {
+        case 'Express': return 'bg-blue-500';
+        case 'Local': return 'bg-gray-500';
+        case 'VIP': return 'bg-purple-600';
+        default: return 'bg-gray-500';
+      }
+    }
+
+    // Initialize
+    setInterval(() => {
+      updateCurrentTime();
+      // Simulate real-time delay update (every 30 sec)
+      buses.forEach(bus => {
+        if (bus.status === "Delayed" && Math.random() > 0.8) {
+          const delay = parseInt(bus.delay) + 1;
+          bus.delay = delay + " min";
+        }
+      });
+      renderBuses();
+    }, 1000);
+
+    // Initial render
+    updateCurrentTime();
+    renderBuses();
+  </script>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passenger Information System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117;
+        }
+        .bus-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .bus-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col items-center p-4 md:p-8">
+
+    <!-- Main Header -->
+    <header class="w-full max-w-6xl text-center mb-8">
+        <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-white">Passenger Information System</h1>
+        <p id="current-time" class="text-xl md:text-2xl mt-2 text-gray-400"></p>
+    </header>
+
+    <!-- Bus Information Container -->
+    <div id="bus-list" class="w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Bus cards will be dynamically inserted here by JavaScript -->
+    </div>
+
+    <!-- JavaScript for data simulation and UI updates -->
+    <script>
+        const busListContainer = document.getElementById('bus-list');
+        const currentTimeDisplay = document.getElementById('current-time');
+
+        // Function to format time
+        const formatTime = (date) => {
+            let hours = date.getHours();
+            let minutes = date.getMinutes();
+            let ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // the hour '0' should be '12'
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            return `${hours}:${minutes} ${ampm}`;
+        };
+        
+        // Function to update the current time every second
+        const updateCurrentTime = () => {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = now.toLocaleDateString('en-US', options);
+            const formattedTime = formatTime(now);
+            currentTimeDisplay.textContent = `${formattedDate} | ${formattedTime}`;
+        };
+
+        // Sample bus data to simulate a real-time feed
+        let busData = [
+            {
+                id: '101',
+                routeId: 'A-12',
+                destination: 'Downtown Express',
+                departureTime: '10:30 AM',
+                arrivalTime: '10:55 AM',
+                status: 'On Time',
+                isDelayed: false,
+                busType: 'Express',
+                platform: 'A3',
+                whereTo: 'Central Station'
+            },
+            {
+                id: '205',
+                routeId: 'B-05',
+                destination: 'City Center Loop',
+                departureTime: '10:45 AM',
+                arrivalTime: '11:10 AM',
+                status: 'Delayed',
+                isDelayed: true,
+                busType: 'Local',
+                platform: 'B1',
+                whereTo: 'Park Plaza'
+            },
+            {
+                id: '302',
+                routeId: 'C-22',
+                destination: 'Airport Shuttle',
+                departureTime: '11:00 AM',
+                arrivalTime: '11:30 AM',
+                status: 'On Time',
+                isDelayed: false,
+                busType: 'VIP',
+                platform: 'C5',
+                whereTo: 'Airport Terminal 1'
+            },
+            {
+                id: '410',
+                routeId: 'D-33',
+                destination: 'East End Express',
+                departureTime: '11:15 AM',
+                arrivalTime: '11:45 AM',
+                status: 'On Time',
+                isDelayed: false,
+                busType: 'Express',
+                platform: 'D2',
+                whereTo: 'Market Square'
+            },
+            {
+                id: '507',
+                routeId: 'E-08',
+                destination: 'Northern Suburbs',
+                departureTime: '11:30 AM',
+                arrivalTime: '12:05 PM',
+                status: 'On Time',
+                isDelayed: false,
+                busType: 'Local',
+                platform: 'E4',
+                whereTo: 'Oakwood Mall'
+            },
+            {
+                id: '601',
+                routeId: 'F-19',
+                destination: 'Business District',
+                departureTime: '11:45 AM',
+                arrivalTime: '12:15 PM',
+                status: 'Delayed',
+                isDelayed: true,
+                busType: 'VIP',
+                platform: 'F1',
+                whereTo: 'Financial Tower'
+            },
+            // Add more sample data here if needed
+        ];
+
+        // Function to render the bus cards
+        const renderBusCards = (data) => {
+            busListContainer.innerHTML = ''; // Clear previous content
+            data.forEach(bus => {
+                const statusColor = bus.isDelayed ? 'bg-red-500' : 'bg-green-500';
+                const statusIcon = bus.isDelayed ? '⚠️' : '✅';
+                
+                const busCardHTML = `
+                    <div class="bus-card bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700 hover:border-blue-500">
+                        <!-- Bus Type & Platform -->
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-sm font-semibold px-3 py-1 rounded-full text-white bg-blue-600">${bus.busType}</span>
+                            <span class="text-lg font-bold text-blue-400">Platform ${bus.platform}</span>
+                        </div>
+
+                        <!-- Bus Number & Route ID -->
+                        <div class="flex items-center mb-2">
+                            <span class="text-2xl font-extrabold text-blue-500 mr-2">${bus.id}</span>
+                            <span class="text-sm font-medium text-gray-400">Route ID: ${bus.routeId}</span>
+                        </div>
+
+                        <!-- Destination & Where To -->
+                        <p class="text-xl font-bold text-white mb-1">${bus.destination}</p>
+                        <p class="text-sm text-gray-400 mb-4">Where to: ${bus.whereTo}</p>
+
+                        <!-- Times & Status -->
+                        <div class="grid grid-cols-2 gap-4 text-sm font-medium">
+                            <div>
+                                <p class="text-gray-500">Departure Time</p>
+                                <p class="text-white text-lg">${bus.departureTime}</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500">Arrival Time</p>
+                                <p class="text-white text-lg">${bus.arrivalTime}</p>
+                            </div>
+                        </div>
+
+                        <!-- Status Alert -->
+                        <div class="mt-4 p-3 rounded-lg ${statusColor} text-white font-semibold flex items-center justify-center">
+                            <span>${statusIcon} ${bus.status}</span>
+                        </div>
+                    </div>
+                `;
+                busListContainer.innerHTML += busCardHTML;
+            });
+        };
+
+        // Function to simulate a new data feed
+        const simulateDataChange = () => {
+            // Randomly pick one bus and change its status
+            const randomIndex = Math.floor(Math.random() * busData.length);
+            const busToUpdate = busData[randomIndex];
+            
+            // Toggle the delay status
+            busToUpdate.isDelayed = !busToUpdate.isDelayed;
+            busToUpdate.status = busToUpdate.isDelayed ? 'Delayed' : 'On Time';
+
+            // If it's delayed, change arrival/departure times slightly
+            if (busToUpdate.isDelayed) {
+                const departureTimeParts = busToUpdate.departureTime.split(':');
+                const departureHour = parseInt(departureTimeParts[0]);
+                const departureMinute = parseInt(departureTimeParts[1].split(' ')[0]);
+                const ampm = departureTimeParts[1].split(' ')[1];
+                const newMinute = (departureMinute + 10) % 60;
+                const newHour = departureMinute + 10 >= 60 ? (departureHour % 12) + 1 : departureHour;
+                
+                busToUpdate.departureTime = `${newHour}:${newMinute < 10 ? '0' + newMinute : newMinute} ${ampm}`;
+                busToUpdate.status = `Delayed by 10 mins`;
+            } else {
+                // Reset times if it's back on time (for this simple simulation)
+                // In a real system, you'd fetch the correct on-time data
+                // For this example, we'll just show 'On Time'
+                busToUpdate.status = 'On Time';
+            }
+            
+            renderBusCards(busData);
+        };
+
+        // Initial render and then update every 10 seconds
+        updateCurrentTime();
+        renderBusCards(busData);
+        setInterval(updateCurrentTime, 1000); // Update time every second
+        setInterval(simulateDataChange, 10000); // Simulate data change every 10 seconds
+    </script>
+</body>
+</html>

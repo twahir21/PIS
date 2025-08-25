@@ -1,0 +1,21 @@
+.card-hover { 
+    transition: box-shadow 0.3s ease; 
+}
+.card-hover:hover { 
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25); 
+}
+.status-on-time { 
+    color: #10B981; 
+}
+.status-delayed { 
+    color: #F59E0B; 
+}
+.status-cancelled { 
+    color: #EF4444; 
+}
+.btn-primary { 
+    transition: all 0.2s ease; 
+}
+.btn-primary:hover { 
+    transform: translateY(-1px); 
+}

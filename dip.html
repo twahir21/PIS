@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metro Transit - Passenger Information System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0056b3',
+                        secondary: '#6c757d',
+                        success: '#28a745',
+                        warning: '#ffc107',
+                        danger: '#dc3545',
+                        info: '#17a2b8',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .bus-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .blink {
+            animation: blink-animation 1s steps(5, start) infinite;
+        }
+        @keyframes blink-animation {
+            to { visibility: hidden; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-primary">Metro Transit PIS</h1>
+                    <p class="text-secondary">Real-time Passenger Information System</p>
+                </div>
+                <div class="text-right">
+                    <div id="current-time" class="text-2xl font-bold"></div>
+                    <div class="text-sm text-secondary">Last updated: <span id="last-updated">Just now</span></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- System Status Alert -->
+        <div id="system-alert" class="hidden mb-6 p-4 rounded-lg bg-warning text-warning-darkest">
+            <div class="flex items-center">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                <span id="alert-message">System alert message appears here</span>
+            </div>
+        </div>
+
+        <!-- Main Dashboard -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Departures Board -->
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="p-5 bg-primary text-white">
+                    <h2 class="text-xl font-bold flex items-center">
+                        <i class="fas fa-bus mr-2"></i> Departures Board
+                    </h2>
+                </div>
+                
+                <!-- Filter Controls -->
+                <div class="p-4 border-b flex flex-wrap gap-2">
+                    <select id="route-filter" class="px-3 py-2 border rounded-md">
+                        <option value="all">All Routes</option>
+                        <option value="101">Route 101</option>
+                        <option value="202">Route 202</option>
+                        <option value="303">Route 303</option>
+                    </select>
+                    <select id="platform-filter" class="px-3 py-2 border rounded-md">
+                        <option value="all">All Platforms</option>
+                        <option value="1">Platform 1</option>
+                        <option value="2">Platform 2</option>
+                        <option value="3">Platform 3</option>
+                    </select>
+                    <select id="bus-type-filter" class="px-3 py-2 border rounded-md">
+                        <option value="all">All Bus Types</option>
+                        <option value="express">Express</option>
+                        <option value="local">Local</option>
+                        <option value="vip">VIP</option>
+                    </select>
+                </div>
+                
+                <!-- Departures List -->
+                <div class="divide-y">
+                    <!-- Departure Item 1 -->
+                    <div class="bus-card p-4 hover:bg-gray-50 transition-all duration-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="flex items-center mb-1">
+                                    <span class="text-xl font-bold mr-3">101</span>
+                                    <span class="px-2 py-1 rounded text-xs font-bold bg-success text-white">ON TIME</span>
+                                    <span class="ml-2 px-2 py-1 rounded text-xs font-bold bg-primary text-white">EXPRESS</span>
+                                </div>
+                                <div class="text-secondary text-sm mb-1">To Downtown Central Station</div>
+                                <div class="text-sm">
+                                    <span class="font-medium">Platform 2</span> • 
+                                    <span>Route ID: M101-2023</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold">10:15</div>
+                                <div class="text-sm text-secondary">Departs in 8 min</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Departure Item 2 (Delayed) -->
+                    <div class="bus-card p-4 hover:bg-gray-50 transition-all duration-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="flex items-center mb-1">
+                                    <span class="text-xl font-bold mr-3">202</span>
+                                    <span class="px-2 py-1 rounded text-xs font-bold bg-danger text-white">DELAYED</span>
+                                    <span class="ml-2 px-2 py-1 rounded text-xs font-bold bg-secondary text-white">LOCAL</span>
+                                </div>
+                                <div class="text-secondary text-sm mb-1">To Northside Terminal via Main Street</div>
+                                <div class="text-sm">
+                                    <span class="font-medium">Platform 1</span> • 
+                                    <span>Route ID: L202-2023</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-danger">10:25</div>
+                                <div class="text-sm text-secondary">Delayed by 15 min</div>
+                            </div>
+                        </div>
+                        <div class="mt-2 p-2 bg-danger bg-opacity-10 text-danger text-sm rounded flex items-start">
+                            <i class="fas fa-info-circle mt-0.5 mr-2"></i>
+                            <span>Bus delayed due to traffic congestion on Main Street</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Departure Item 3 (VIP) -->
+                    <div class="bus-card p-4 hover:bg-gray-50 transition-all duration-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="flex items-center mb-1">
+                                    <span class="text-xl font-bold mr-3">303</span>
+                                    <span class="px-2 py-1 rounded text-xs font-bold bg-success text-white">ON TIME</span>
+                                    <span class="ml-2 px-2 py-1 rounded text-xs font-bold bg-purple-600 text-white">VIP</span>
+                                </div>
+                                <div class="text-secondary text-sm mb-1">To Airport Express Terminal</div>
+                                <div class="text-sm">
+                                    <span class="font-medium">Platform 3</span> • 
+                                    <span>Route ID: V303-2023</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold">10:40</div>
+                                <div class="text-sm text-secondary">Departs in 33 min</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Information Panel -->
+            <div class="space-y-6">
+                <!-- Current Time & Alerts -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div class="p-5 bg-info text-white">
+                        <h2 class="text-xl font-bold flex items-center">
+                            <i class="fas fa-clock mr-2"></i> Current Time
+                        </h2>
+                    </div>
+                    <div class="p-6 text-center">
+                        <div id="large-clock" class="text-5xl font-bold mb-2"></div>
+                        <div class="text-secondary">Station Time</div>
+                    </div>
+                </div>
+                
+                <!-- Service Alerts -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div class="p-5 bg-danger text-white">
+                        <h2 class="text-xl font-bold flex items-center">
+                            <i class="fas fa-exclamation-circle mr-2"></i> Service Alerts
+                        </h2>
+                    </div>
+                    <div class="p-4">
+                        <div class="alert-item mb-3 pb-3 border-b">
+                            <div class="flex items-start">
+                                <div class="text-danger mr-3 mt-1">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold">Route 202 Delay</div>
+                                    <div class="text-sm text-secondary">Expected 15 min delay due to traffic congestion</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert-item">
+                            <div class="flex items-start">
+                                <div class="text-warning mr-3 mt-1">
+                                    <i class="fas fa-tools"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold">Platform 3 Maintenance</div>
+                                    <div class="text-sm text-secondary">Temporary closure from 10PM-2AM tonight</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div class="p-5 bg-primary text-white">
+                        <h2 class="text-xl font-bold flex items-center">
+                            <i class="fas fa-link mr-2"></i> Quick Links
+                        </h2>
+                    </div>
+                    <div class="p-4 grid grid-cols-2 gap-2">
+                        <a href="#" class="p-3 bg-gray-100 rounded-lg text-center hover:bg-gray-200 transition">
+                            <i class="fas fa-map-marked-alt text-primary mb-1"></i>
+                            <div class="text-sm">Station Map</div>
+                        </a>
+                        <a href="#" class="p-3 bg-gray-100 rounded-lg text-center hover:bg-gray-200 transition">
+                            <i class="fas fa-ticket-alt text-primary mb-1"></i>
+                            <div class="text-sm">Fares</div>
+                        </a>
+                        <a href="#" class="p-3 bg-gray-100 rounded-lg text-center hover:bg-gray-200 transition">
+                            <i class="fas fa-wheelchair text-primary mb-1"></i>
+                            <div class="text-sm">Accessibility</div>
+                        </a>
+                        <a href="#" class="p-3 bg-gray-100 rounded-lg text-center hover:bg-gray-200 transition">
+                            <i class="fas fa-question-circle text-primary mb-1"></i>
+                            <div class="text-sm">Help</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update current time
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = now.toLocaleTimeString();
+            document.getElementById('large-clock').textContent = now.toLocaleTimeString();
+            document.getElementById('last-updated').textContent = 'Updated: ' + now.toLocaleTimeString();
+        }
+        
+        setInterval(updateClock, 1000);
+        updateClock();
+        
+        // Simulate real-time updates
+        setInterval(() => {
+            // In a real app, this would fetch data from your API
+            const randomBus = Math.floor(Math.random() * 3) + 1;
+            const statuses = ['ON TIME', 'DELAYED'];
+            const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+            
+            // Update random bus status for demo purposes
+            const busElements = document.querySelectorAll('.bus-card');
+            if (busElements.length > 0) {
+                const randomIndex = Math.floor(Math.random() * busElements.length);
+                const busElement = busElements[randomIndex];
+                
+                // Update status
+                const statusElement = busElement.querySelector('.bg-success, .bg-danger');
+                if (statusElement) {
+                    if (randomStatus === 'DELAYED') {
+                        statusElement.className = 'px-2 py-1 rounded text-xs font-bold bg-danger text-white';
+                        statusElement.textContent = 'DELAYED';
+                        
+                        // Add delay notification if not already present
+                        if (!busElement.querySelector('.fa-info-circle')) {
+                            const delayNote = document.createElement('div');
+                            delayNote.className = 'mt-2 p-2 bg-danger bg-opacity-10 text-danger text-sm rounded flex items-start';
+                            delayNote.innerHTML = '<i class="fas fa-info-circle mt-0.5 mr-2"></i><span>Bus delayed due to unexpected traffic</span>';
+                            busElement.appendChild(delayNote);
+                        }
+                    } else {
+                        statusElement.className = 'px-2 py-1 rounded text-xs font-bold bg-success text-white';
+                        statusElement.textContent = 'ON TIME';
+                        
+                        // Remove delay notification if exists
+                        const delayNote = busElement.querySelector('.fa-info-circle');
+                        if (delayNote) {
+                            delayNote.closest('div').remove();
+                        }
+                    }
+                }
+            }
+        }, 10000); // Update every 10 seconds
+        
+        // Filter functionality
+        document.getElementById('route-filter').addEventListener('change', filterDepartures);
+        document.getElementById('platform-filter').addEventListener('change', filterDepartures);
+        document.getElementById('bus-type-filter').addEventListener('change', filterDepartures);
+        
+        function filterDepartures() {
+            const routeFilter = document.getElementById('route-filter').value;
+            const platformFilter = document.getElementById('platform-filter').value;
+            const busTypeFilter = document.getElementById('bus-type-filter').value;
+            
+            document.querySelectorAll('.bus-card').forEach(card => {
+                const route = card.querySelector('span.text-xl').textContent.trim();
+                const platform = card.textContent.includes('Platform') ? 
+                    card.textContent.match(/Platform (\d+)/)[1] : '';
+                const busType = card.textContent.includes('EXPRESS') ? 'express' :
+                                card.textContent.includes('LOCAL') ? 'local' :
+                                card.textContent.includes('VIP') ? 'vip' : '';
+                
+                const showRoute = routeFilter === 'all' || route === routeFilter;
+                const showPlatform = platformFilter === 'all' || platform === platformFilter;
+                const showBusType = busTypeFilter === 'all' || busType === busTypeFilter;
+                
+                if (showRoute && showPlatform && showBusType) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

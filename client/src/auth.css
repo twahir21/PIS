@@ -1,0 +1,7 @@
+.login-card {
+backdrop-filter: blur(10px);
+box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+.input-field:focus {
+box-shadow: 0 0 0 3px rgba(255, 196, 0, 0.2);
+}
