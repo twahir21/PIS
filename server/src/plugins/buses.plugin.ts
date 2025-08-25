@@ -10,7 +10,6 @@ export const busesPlugin = new Elysia({ name : "Buses crud" })
     .use(jwt({
         name: 'jwt',
         secret: process.env.JWT_KEY!,
-        exp: "7d"
     }))
     .get("/buses", async({ status }) => {
         const result = await busServices.getBus();

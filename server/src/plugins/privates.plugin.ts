@@ -8,7 +8,6 @@ export const privateRoutes = new Elysia({ name : "Private routes" })
     .use(jwt({
         name: 'jwt',
         secret: process.env.JWT_KEY!,
-        exp: "7d"
     }))
     .guard({
         async beforeHandle({ jwt, request }) {

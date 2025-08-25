@@ -8,7 +8,6 @@ export const authPlugin = new Elysia({ name : "Auth Route" })
     .use(jwt({
         name: 'jwt',
         secret: process.env.JWT_KEY!,
-        exp: "7d"     
     }))
     .post("/login", async ({ body, status, jwt }) => {
 
