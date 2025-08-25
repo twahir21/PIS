@@ -9,7 +9,8 @@ import { jwtCheck } from "../secure/jwtcheck.secure";
 export const assistantsPlugin = new Elysia({ name : "Assistants" })
     .use(jwt({
         name: 'jwt',
-        secret: process.env.JWT_KEY!
+        secret: process.env.JWT_KEY!,
+        exp: "7d"
     }))
     .get("/assistants", async({ status }) => {
         const result = await assistantServices.get();
